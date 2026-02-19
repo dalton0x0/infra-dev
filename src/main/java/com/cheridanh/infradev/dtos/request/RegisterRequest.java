@@ -24,9 +24,7 @@ public class RegisterRequest {
     private String lastName;
 
     @NotBlank(message = "L'email est obligatoire")
-    @Email(message = "L'email doit être valide",
-            regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]++(\\.[A-Za-z0-9_-]++)*+@"
-                    + "[^-][A-Za-z0-9-]++(\\.[A-Za-z0-9-]++)*+(\\.[A-Za-z]{2,})$")
+    @Email(message = "L'email doit être valide", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}\\.[a-zA-Z]{2,}$")
     private String email;
 
     @NotBlank(message = "Le mot de passe est obligatoire")
