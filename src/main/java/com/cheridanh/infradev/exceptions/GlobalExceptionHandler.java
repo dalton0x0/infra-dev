@@ -5,11 +5,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.*;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -43,6 +47,65 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère les erreurs de conversion de type sur les paramètres de requête.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+
+        log.warn("Erreur de type sur {} : {}", request.getRequestURI(), ex.getMessage());
+
+        String message = String.format("Le paramètre '%s' a une valeur invalide: '%s'",
+                ex.getName(), ex.getValue());
+
+        return buildErrorResponseEntity(
+                HttpStatus.BAD_REQUEST,
+                "Erreur de type",
+                message,
+                request);
+    }
+
+    /**
+     * Gère les requêtes vers des ressources inexistantes (route non mappée).
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(
+            NoResourceFoundException ex, HttpServletRequest request) {
+
+        log.warn("Ressource introuvable sur {} : {}", request.getRequestURI(), ex.getMessage());
+
+        return buildErrorResponseEntity(
+                HttpStatus.NOT_FOUND,
+                "Ressource introuvable",
+                String.format("Aucune ressource trouvée pour %s %s", ex.getHttpMethod(), ex.getResourcePath()),
+                request
+        );
+    }
+
+    /**
+     * Gère les requêtes utilisant une méthode HTTP non supportée sur l'endpoint ciblé.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+
+        log.warn("Méthode HTTP non supportée sur {} : {}", request.getRequestURI(), ex.getMessage());
+
+        String message = String.format(
+                "La méthode '%s' n'est pas supportée sur cet endpoint. Méthodes acceptées : %s",
+                ex.getMethod(),
+                ex.getSupportedHttpMethods()
+        );
+
+        return buildErrorResponseEntity(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                "Méthode non supportée",
+                message,
+                request
+        );
+    }
+
+    /**
      * Gère les tentatives de connexion avec des identifiants invalides.
      */
     @ExceptionHandler({InvalidCredentialsException.class, BadCredentialsException.class})
@@ -54,6 +117,23 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(
                 HttpStatus.UNAUTHORIZED, "Authentification échouée",
                 "Email ou mot de passe incorrect", request
+        );
+    }
+
+    /**
+     * Gère les tentatives d'accès aux ressources non autorisées.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            AccessDeniedException ex, HttpServletRequest request) {
+
+        log.warn("Access denied sur {} : {}", request.getRequestURI(), ex.getMessage());
+
+        return buildErrorResponseEntity(
+                HttpStatus.FORBIDDEN,
+                "Vous n'avez pas les permissions requises.",
+                ex.getMessage(),
+                request
         );
     }
 
@@ -178,6 +258,38 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(
                 HttpStatus.NOT_FOUND, "Utilisateur non trouvé",
                 ex.getMessage(), request
+        );
+    }
+
+    /**
+     * Gère les promotions non trouvées.
+     */
+    @ExceptionHandler(PromotionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePromotionNotFound(
+            PromotionNotFoundException ex, HttpServletRequest request) {
+
+        log.warn("Promotion non trouvée sur {} : {}", request.getRequestURI(), ex.getMessage());
+
+        return buildErrorResponseEntity(
+                HttpStatus.NOT_FOUND, "Promotion non trouvée",
+                ex.getMessage(), request
+        );
+    }
+
+    /**
+     * Gère les duplications de ressources.
+     */
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateResource(
+            DuplicateResourceException ex, HttpServletRequest request) {
+
+        log.warn("Duplication de ressource sur {} : {}", request.getRequestURI(), ex.getMessage());
+
+        return buildErrorResponseEntity(
+                HttpStatus.CONFLICT,
+                "Conflit",
+                ex.getMessage(),
+                request
         );
     }
 

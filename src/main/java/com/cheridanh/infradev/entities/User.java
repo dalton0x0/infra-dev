@@ -1,7 +1,10 @@
 package com.cheridanh.infradev.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,9 +15,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "users", indexes = {@Index(name = "idx_email", columnList = "email", unique = true)})
-@Getter
-@Setter
+@Table(name = "users", indexes = {
+        @Index(name = "idx_email", columnList = "email", unique = true),
+        @Index(name = "idx_promotion_id", columnList = "promotion_id")
+})
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -42,6 +47,10 @@ public class User implements UserDetails {
 
     private String avatar;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "promotion_id")
+    private Promotion promotion;
+
     @Builder.Default
     @Column(nullable = false)
     private boolean enabled = true;
@@ -64,7 +73,6 @@ public class User implements UserDetails {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
 
     /**
      * Retourne les autorités accordées à l'utilisateur (rôle préfixé par ROLE_).
