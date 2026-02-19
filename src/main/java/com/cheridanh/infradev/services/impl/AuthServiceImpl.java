@@ -5,6 +5,7 @@ import com.cheridanh.infradev.dtos.request.LogoutRequest;
 import com.cheridanh.infradev.dtos.request.RefreshTokenRequest;
 import com.cheridanh.infradev.dtos.request.RegisterRequest;
 import com.cheridanh.infradev.dtos.response.AuthResponse;
+import com.cheridanh.infradev.entities.Promotion;
 import com.cheridanh.infradev.entities.RefreshToken;
 import com.cheridanh.infradev.entities.Role;
 import com.cheridanh.infradev.entities.User;
@@ -12,6 +13,7 @@ import com.cheridanh.infradev.exceptions.EmailAlreadyExistsException;
 import com.cheridanh.infradev.exceptions.InvalidCredentialsException;
 import com.cheridanh.infradev.exceptions.InvalidTokenException;
 import com.cheridanh.infradev.exceptions.UserNotFoundException;
+import com.cheridanh.infradev.repositories.PromotionRepository;
 import com.cheridanh.infradev.repositories.UserRepository;
 import com.cheridanh.infradev.services.AuthService;
 import com.cheridanh.infradev.services.RefreshTokenService;
@@ -25,7 +27,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -33,6 +37,7 @@ import java.time.LocalDateTime;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final PromotionRepository promotionRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -47,12 +52,21 @@ public class AuthServiceImpl implements AuthService {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
+        Optional<Promotion> activePromotion = promotionRepository.findActiveByDate(LocalDate.now());
+
+        if (activePromotion.isPresent()) {
+            log.debug("Promotion active trouvée pour l'inscription : {}", activePromotion.get().getName());
+        } else {
+            log.debug("Aucune promotion active trouvée pour la date du jour");
+        }
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .promotion(activePromotion.orElse(null))
                 .build();
 
         userRepository.save(user);
@@ -128,9 +142,13 @@ public class AuthServiceImpl implements AuthService {
         log.info("Déconnexion réussie pour l'utilisateur id : {}", refreshToken.getUser().getId());
     }
 
-
     /**
-     * Construit la réponse d'authentification avec les tokens et les infos utilisateur.
+     * Construit la réponse d'authentification avec les tokens et les informations utilisateur.
+     *
+     * @param accessToken le token d'accès JWT
+     * @param refreshToken le refresh token
+     * @param user l'utilisateur authentifié
+     * @return la réponse d'authentification complète
      */
     private AuthResponse buildAuthResponse(String accessToken, String refreshToken, User user) {
         return AuthResponse.builder()
