@@ -1,24 +1,23 @@
-package com.cheridanh.infradev.configs;
+package com.cheridanh.infradev.security;
 
 import com.cheridanh.infradev.dtos.response.ErrorResponse;
+import com.cheridanh.infradev.services.CustomUserDetailsService;
 import com.cheridanh.infradev.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -35,11 +34,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
-
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -85,8 +82,8 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void authenticateUser(HttpServletRequest request, String jwt, String username) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    private void authenticateUser(HttpServletRequest request, String jwt, String email) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         if (jwtUtil.validateToken(jwt, userDetails)) {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -97,9 +94,9 @@ public class JwtFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            log.debug("Authentification JWT réussie pour : {}", username);
+            log.debug("Authentification JWT réussie pour : {}", email);
         } else {
-            log.warn("Validation du token JWT échouée pour : {}", username);
+            log.warn("Validation du token JWT échouée pour : {}", email);
         }
     }
 
@@ -121,6 +118,6 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        OBJECT_MAPPER.writeValue(response.getOutputStream(), errorResponse);
+        objectMapper.writeValue(response.getOutputStream(), errorResponse);
     }
 }

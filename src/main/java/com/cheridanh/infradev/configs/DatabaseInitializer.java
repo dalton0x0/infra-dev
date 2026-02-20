@@ -3,9 +3,9 @@ package com.cheridanh.infradev.configs;
 import com.cheridanh.infradev.entities.Role;
 import com.cheridanh.infradev.entities.User;
 import com.cheridanh.infradev.repositories.UserRepository;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,14 +33,13 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     @Override
     public void run(String @NonNull ... args) {
-        log.info("Initializing database");
+        log.info("Initialisation de la base de données");
         initializeAdminUser();
     }
 
     private void initializeAdminUser() {
-
-        if(!userRepository.existsByEmail(adminEmail)) {
-            log.info("Creating admin user");
+        if (!userRepository.existsByEmail(adminEmail)) {
+            log.info("Création du compte administrateur");
 
             User admin = User.builder()
                     .firstName(adminFirstName)
@@ -52,9 +51,9 @@ public class DatabaseInitializer implements CommandLineRunner {
                     .build();
 
             userRepository.save(admin);
-            log.info("Admin user created successfully");
+            log.info("Compte administrateur créé avec succès");
         } else {
-            log.info("Admin user already exists");
+            log.info("Le compte administrateur existe déjà, initialisation ignorée");
         }
     }
 }
