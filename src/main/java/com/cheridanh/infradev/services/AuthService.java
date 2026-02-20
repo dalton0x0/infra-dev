@@ -25,15 +25,16 @@ public interface AuthService {
     AuthResponse login(LoginRequest request);
 
     /**
-     * Renouvelle le access token à partir d'un refresh token valide.
+     * Renouvelle le token d'accès à partir d'un refresh token valide.
+     * Effectue une rotation du refresh token : l'ancien est révoqué et un nouveau est émis.
      *
-     * @param request le refresh token
-     * @return la réponse contenant le nouveau access token et le même refresh token
+     * @param request le refresh token courant
+     * @return la réponse contenant le nouveau token d'accès et le nouveau refresh token
      */
     AuthResponse refreshToken(RefreshTokenRequest request);
 
     /**
-     * Déconnecte l'utilisateur en révoquant son refresh token.
+     * Déconnecte l'utilisateur en révoquant tous ses refresh tokens actifs.
      *
      * @param request le refresh token à révoquer
      */

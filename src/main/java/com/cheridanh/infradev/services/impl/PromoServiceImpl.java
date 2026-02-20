@@ -25,7 +25,7 @@ public class PromoServiceImpl implements PromoService {
     @Override
     @Transactional(readOnly = true)
     public List<PromoResponse> getAllPromos() {
-        log.info("Récupération de toutes les promotions");
+        log.debug("Récupération de toutes les promotions");
 
         List<PromoResponse> promotions = promotionRepository.findAll()
                 .stream()
