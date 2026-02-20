@@ -11,10 +11,10 @@ import com.cheridanh.infradev.entities.Role;
 import com.cheridanh.infradev.entities.User;
 import com.cheridanh.infradev.exceptions.EmailAlreadyExistsException;
 import com.cheridanh.infradev.exceptions.InvalidCredentialsException;
-import com.cheridanh.infradev.exceptions.InvalidTokenException;
 import com.cheridanh.infradev.exceptions.UserNotFoundException;
 import com.cheridanh.infradev.repositories.PromotionRepository;
 import com.cheridanh.infradev.repositories.UserRepository;
+import com.cheridanh.infradev.security.UserDetailsImpl;
 import com.cheridanh.infradev.services.AuthService;
 import com.cheridanh.infradev.services.RefreshTokenService;
 import com.cheridanh.infradev.utils.JwtUtil;
@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
         log.info("Nouvel utilisateur inscrit avec succès, id : {}", user.getId());
 
-        String accessToken = jwtUtil.generateToken(user);
+        String accessToken = jwtUtil.generateToken(UserDetailsImpl.build(user));
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
         return buildAuthResponse(accessToken, refreshToken.getToken(), user);
@@ -89,20 +89,19 @@ public class AuthServiceImpl implements AuthService {
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
-            User savedUser = userRepository.findByEmail(request.getEmail()).orElseThrow(
-                    () -> new UserNotFoundException(request.getEmail())
-            );
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new UserNotFoundException(request.getEmail()));
 
-            savedUser.setLastLogin(LocalDateTime.now());
-            userRepository.save(savedUser);
+            user.setLastLogin(LocalDateTime.now());
+            userRepository.save(user);
 
-            refreshTokenService.revokeAllUserTokens(savedUser.getId());
-            String accessToken = jwtUtil.generateToken(savedUser);
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
+            refreshTokenService.revokeAllUserTokens(user.getId());
+            String accessToken = jwtUtil.generateToken(UserDetailsImpl.build(user));
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-            log.info("Connexion réussie pour l'utilisateur id : {}", savedUser.getId());
+            log.info("Connexion réussie pour l'utilisateur id : {}", user.getId());
 
-            return buildAuthResponse(accessToken, refreshToken.getToken(), savedUser);
+            return buildAuthResponse(accessToken, refreshToken.getToken(), user);
 
         } catch (BadCredentialsException ex) {
             log.warn("Échec de connexion : identifiants invalides");
@@ -119,7 +118,7 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken validatedToken = refreshTokenService.validateRefreshToken(request.getRefreshToken());
         User user = validatedToken.getUser();
         RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(validatedToken);
-        String newAccessToken = jwtUtil.generateToken(user);
+        String newAccessToken = jwtUtil.generateToken(UserDetailsImpl.build(user));
 
         log.info("Tokens renouvelés pour l'utilisateur id : {}", user.getId());
 
@@ -130,11 +129,6 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void logout(LogoutRequest request) {
         log.debug("Tentative de déconnexion");
-
-        if (request.getRefreshToken() == null || request.getRefreshToken().isBlank()) {
-            log.debug("Tentative de déconnexion sans refresh token");
-            throw new InvalidTokenException("Refresh token introuvable ou vide");
-        }
 
         RefreshToken refreshToken = refreshTokenService.validateRefreshToken(request.getRefreshToken());
         refreshTokenService.revokeAllUserTokens(refreshToken.getUser().getId());

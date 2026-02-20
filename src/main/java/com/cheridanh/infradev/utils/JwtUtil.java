@@ -1,6 +1,7 @@
 package com.cheridanh.infradev.utils;
 
 import com.cheridanh.infradev.configs.JwtProperties;
+import com.cheridanh.infradev.security.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -45,15 +46,16 @@ public class JwtUtil {
      * @param userDetails les détails de l'utilisateur Spring Security
      * @return le token JWT généré
      */
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetailsImpl userDetails) {
         Map<String, Object> claims = new HashMap<>();
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
         claims.put("roles", roles);
+        claims.put("fullName", userDetails.getFullName());
 
-        log.debug("Génération du token JWT pour : {} avec les roles : {}", userDetails.getUsername(), roles);
+        log.debug("Génération du token JWT pour : {} avec les rôles : {}", userDetails.getUsername(), roles);
 
         return createToken(claims, userDetails.getUsername());
     }
