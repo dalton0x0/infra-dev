@@ -38,8 +38,10 @@ public class GlobalExceptionHandler {
         log.warn("Erreur de validation sur {} : {}", request.getRequestURI(), errors);
 
         ErrorResponse response = buildErrorResponse(
-                HttpStatus.BAD_REQUEST, "Erreur de validation",
-                "Un ou plusieurs champs sont invalides", request
+                HttpStatus.BAD_REQUEST,
+                "Erreur de validation",
+                "Un ou plusieurs champs sont invalides",
+                request
         );
         response.setValidationErrors(errors);
 
@@ -115,8 +117,10 @@ public class GlobalExceptionHandler {
         log.warn("Échec d'authentification sur {} : {}", request.getRequestURI(), ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.UNAUTHORIZED, "Authentification échouée",
-                "Email ou mot de passe incorrect", request
+                HttpStatus.UNAUTHORIZED,
+                "Authentification échouée",
+                "Email ou mot de passe incorrect",
+                request
         );
     }
 
@@ -147,8 +151,10 @@ public class GlobalExceptionHandler {
         log.warn("Token invalide sur {} : {}", request.getRequestURI(), ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.UNAUTHORIZED, "Token invalide",
-                ex.getMessage(), request
+                HttpStatus.UNAUTHORIZED,
+                "Token invalide",
+                ex.getMessage(),
+                request
         );
     }
 
@@ -162,8 +168,10 @@ public class GlobalExceptionHandler {
         log.warn("Refresh token expiré sur {}", request.getRequestURI());
 
         return buildErrorResponseEntity(
-                HttpStatus.UNAUTHORIZED, "Token expiré",
-                ex.getMessage(), request
+                HttpStatus.UNAUTHORIZED,
+                "Token expiré",
+                ex.getMessage(),
+                request
         );
     }
 
@@ -178,8 +186,10 @@ public class GlobalExceptionHandler {
         log.debug("DisabledException : {}", ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.FORBIDDEN, "Compte désactivé",
-                "Votre compte a été désactivé. Veuillez contacter l'administrateur.", request
+                HttpStatus.FORBIDDEN,
+                "Compte désactivé",
+                "Votre compte a été désactivé. Veuillez contacter l'administrateur.",
+                request
         );
     }
 
@@ -194,8 +204,10 @@ public class GlobalExceptionHandler {
         log.debug("LockedException : {}", ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.FORBIDDEN, "Compte verrouillé",
-                "Votre compte est temporairement verrouillé. Veuillez réessayer plus tard.", request
+                HttpStatus.FORBIDDEN,
+                "Compte verrouillé",
+                "Votre compte est temporairement verrouillé. Veuillez réessayer plus tard.",
+                request
         );
     }
 
@@ -210,8 +222,10 @@ public class GlobalExceptionHandler {
         log.debug("AccountExpiredException : {}", ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.FORBIDDEN, "Compte expiré",
-                "Votre compte a expiré. Veuillez contacter l'administrateur.", request
+                HttpStatus.FORBIDDEN,
+                "Compte expiré",
+                "Votre compte a expiré. Veuillez contacter l'administrateur.",
+                request
         );
     }
 
@@ -226,8 +240,10 @@ public class GlobalExceptionHandler {
         log.debug("CredentialsExpiredException : {}", ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.FORBIDDEN, "Identifiants expirés",
-                "Votre mot de passe a expiré. Veuillez le réinitialiser.", request
+                HttpStatus.FORBIDDEN,
+                "Identifiants expirés",
+                "Votre mot de passe a expiré. Veuillez le réinitialiser.",
+                request
         );
     }
 
@@ -241,8 +257,10 @@ public class GlobalExceptionHandler {
         log.warn("Tentative d'inscription avec un email existant sur {}", request.getRequestURI());
 
         return buildErrorResponseEntity(
-                HttpStatus.CONFLICT, "Conflit",
-                ex.getMessage(), request
+                HttpStatus.CONFLICT,
+                "Conflit",
+                ex.getMessage(),
+                request
         );
     }
 
@@ -256,8 +274,10 @@ public class GlobalExceptionHandler {
         log.warn("Utilisateur non trouvé sur {} : {}", request.getRequestURI(), ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.NOT_FOUND, "Utilisateur non trouvé",
-                ex.getMessage(), request
+                HttpStatus.NOT_FOUND,
+                "Utilisateur non trouvé",
+                ex.getMessage(),
+                request
         );
     }
 
@@ -271,8 +291,10 @@ public class GlobalExceptionHandler {
         log.warn("Promotion non trouvée sur {} : {}", request.getRequestURI(), ex.getMessage());
 
         return buildErrorResponseEntity(
-                HttpStatus.NOT_FOUND, "Promotion non trouvée",
-                ex.getMessage(), request
+                HttpStatus.NOT_FOUND,
+                "Promotion non trouvée",
+                ex.getMessage(),
+                request
         );
     }
 
@@ -303,8 +325,10 @@ public class GlobalExceptionHandler {
         log.error("Erreur interne sur {} : {}", request.getRequestURI(), ex.getMessage(), ex);
 
         return buildErrorResponseEntity(
-                HttpStatus.INTERNAL_SERVER_ERROR, "Erreur interne",
-                "Une erreur inattendue s'est produite", request
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Erreur interne",
+                "Une erreur inattendue s'est produite",
+                request
         );
     }
 

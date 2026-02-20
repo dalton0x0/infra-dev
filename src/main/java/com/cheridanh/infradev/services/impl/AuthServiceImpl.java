@@ -60,15 +60,7 @@ public class AuthServiceImpl implements AuthService {
             log.debug("Aucune promotion active trouvée pour la date du jour");
         }
 
-        User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .promotion(activePromotion.orElse(null))
-                .build();
-
+        User user = buildNewUser(request, activePromotion);
         userRepository.save(user);
 
         log.info("Nouvel utilisateur inscrit avec succès, id : {}", user.getId());
@@ -134,6 +126,24 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenService.revokeAllUserTokens(refreshToken.getUser().getId());
 
         log.info("Déconnexion réussie pour l'utilisateur id : {}", refreshToken.getUser().getId());
+    }
+
+    /**
+     * Construit le nouvel utilisateur à partir d'un {@link RegisterRequest}
+     *
+     * @param request la requête d'inscription
+     * @param activePromotion la promotion active pour l'inscription
+     * @return l'utilisateur construit
+     */
+    private User buildNewUser(RegisterRequest request, Optional<Promotion> activePromotion) {
+        return User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
+                .promotion(activePromotion.orElse(null))
+                .build();
     }
 
     /**

@@ -64,18 +64,32 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException ex) {
             log.warn("Token JWT expiré sur la requête : {} {}", request.getMethod(), request.getRequestURI());
             log.debug("ExpiredJwtException : {}", ex.getMessage());
-            sendErrorResponse(response, request, "Token expiré", "Le token d'accès a expiré, veuillez le renouveler");
+            sendErrorResponse(
+                    response, request,
+                    "Token expiré",
+                    "Le token d'accès a expiré, veuillez le renouveler"
+            );
             return;
 
         } catch (JwtException ex) {
             log.warn("Token JWT invalide sur la requête : {} {} - Cause : {}", request.getMethod(), request.getRequestURI(), ex.getMessage());
-            sendErrorResponse(response, request, "Token invalide", "Le token d'accès est invalide");
+            sendErrorResponse(
+                    response,
+                    request,
+                    "Token invalide",
+                    "Le token d'accès est invalide"
+            );
             return;
 
         } catch (UsernameNotFoundException ex) {
             log.warn("Utilisateur du token JWT introuvable sur : {} {}", request.getMethod(), request.getRequestURI());
             log.debug("UsernameNotFoundException : {}", ex.getMessage());
-            sendErrorResponse(response, request, "Utilisateur introuvable", "L'utilisateur associé au token n'existe plus");
+            sendErrorResponse(
+                    response,
+                    request,
+                    "Utilisateur introuvable",
+                    "L'utilisateur associé au token n'existe plus"
+            );
             return;
         }
 
