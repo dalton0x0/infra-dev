@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "modules", indexes = {
         @Index(name = "idx_module_name", columnList = "name", unique = true),
-        @Index(name = "idx_module_bloc", columnList = "bloc_id"),
+        @Index(name = "idx_module_block", columnList = "block_id"),
         @Index(name = "idx_module_quiz", columnList = "quiz_id")
 })
 @Data
@@ -32,8 +32,8 @@ public class Module {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bloc_id")
-    private Bloc bloc;
+    @JoinColumn(name = "block_id")
+    private Block block;
 
     @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
     @Builder.Default

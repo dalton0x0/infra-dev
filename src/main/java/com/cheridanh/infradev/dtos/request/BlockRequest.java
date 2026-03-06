@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BlocRequest {
+public class BlockRequest {
 
     @NotBlank(message = "Le nom du bloc est obligatoire")
     private String name;
