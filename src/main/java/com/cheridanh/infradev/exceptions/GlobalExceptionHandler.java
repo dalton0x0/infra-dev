@@ -299,6 +299,23 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère les ressources non trouvées (exception générique).
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(
+            ResourceNotFoundException ex, HttpServletRequest request) {
+
+        log.warn("Ressource non trouvée sur {} : {}", request.getRequestURI(), ex.getMessage());
+
+        return buildErrorResponseEntity(
+                HttpStatus.NOT_FOUND,
+                "Ressource non trouvée",
+                ex.getMessage(),
+                request
+        );
+    }
+
+    /**
      * Gère les duplications de ressources.
      */
     @ExceptionHandler(DuplicateResourceException.class)
