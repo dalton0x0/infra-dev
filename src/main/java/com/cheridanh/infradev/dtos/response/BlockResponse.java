@@ -1,6 +1,6 @@
 package com.cheridanh.infradev.dtos.response;
 
-import com.cheridanh.infradev.entities.Bloc;
+import com.cheridanh.infradev.entities.Block;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,22 +10,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BlocResponse {
+public class BlockResponse {
 
     private Long id;
     private String name;
 
     /**
-     * Construit un {@link BlocResponse} à partir de l'entité {@link Bloc}
+     * Construit un {@link BlockResponse} à partir de l'entité {@link Block}
      * sans la liste des modules
      *
-     * @param bloc l'entité bloc source
+     * @param block l'entité bloc source
      * @return le dto sans les modules
      */
-    public static BlocResponse fromEntity(Bloc bloc) {
-        return BlocResponse.builder()
-                .id(bloc.getId())
-                .name(bloc.getName())
+    public static BlockResponse fromEntity(Block block) {
+        return BlockResponse.builder()
+                .id(block.getId())
+                .name(block.getName())
                 .build();
     }
 }

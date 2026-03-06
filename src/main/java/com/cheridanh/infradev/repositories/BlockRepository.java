@@ -1,11 +1,11 @@
 package com.cheridanh.infradev.repositories;
 
-import com.cheridanh.infradev.entities.Bloc;
+import com.cheridanh.infradev.entities.Block;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BlocRepository extends JpaRepository<Bloc, Long> {
+public interface BlockRepository extends JpaRepository<Block, Long> {
 
     /**
      * Vérifie si le nom du bloc est déjà utilisé (insensible à la casse).

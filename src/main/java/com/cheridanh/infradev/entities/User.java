@@ -48,12 +48,12 @@ public class User {
     private Promotion promotion;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_bloc",
+    @JoinTable(name = "user_block",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "bloc_id")
+            inverseJoinColumns = @JoinColumn(name = "block_id")
     )
     @Builder.Default
-    private List<Bloc> blocs = new ArrayList<>();
+    private List<Block> blocks = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_exercise",

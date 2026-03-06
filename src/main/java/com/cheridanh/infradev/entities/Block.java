@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "blocs", indexes = {
-        @Index(name = "idx_bloc_name", columnList = "name", unique = true),
+@Table(name = "blocks", indexes = {
+        @Index(name = "idx_block_name", columnList = "name", unique = true),
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Bloc {
+public class Block {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +31,11 @@ public class Bloc {
 
     private String cover;
 
-    @ManyToMany(mappedBy = "blocs", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "blocks", fetch = FetchType.LAZY)
     @Builder.Default
     private List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "bloc", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "block", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Module> modules = new ArrayList<>();
 

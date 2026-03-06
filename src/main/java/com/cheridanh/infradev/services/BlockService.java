@@ -1,18 +1,18 @@
 package com.cheridanh.infradev.services;
 
-import com.cheridanh.infradev.dtos.request.BlocRequest;
-import com.cheridanh.infradev.dtos.response.BlocResponse;
+import com.cheridanh.infradev.dtos.request.BlockRequest;
+import com.cheridanh.infradev.dtos.response.BlockResponse;
 
 import java.util.List;
 
-public interface BlocService {
+public interface BlockService {
 
     /**
      * Récupère tous les blocs
      *
      * @return la liste des blocs
      */
-    List<BlocResponse> getAllBlocs();
+    List<BlockResponse> getAllBlocks();
 
     /**
      * Récupère un bloc par son identifiant, avec la liste de ses modules.
@@ -20,29 +20,29 @@ public interface BlocService {
      * @param id l'identifiant du bloc
      * @return le bloc avec ses modules
      */
-    BlocResponse getBlocById(Long id);
+    BlockResponse getBlockById(Long id);
 
     /**
      * Crée un nouveau bloc.
      *
-     * @param blocRequest les données du bloc à créer
+     * @param blockRequest les données du bloc à créer
      * @return le bloc créé
      */
-    BlocResponse createBloc(BlocRequest blocRequest);
+    BlockResponse createBlock(BlockRequest blockRequest);
 
     /**
      * Met à jour un bloc existant.
      *
      * @param id l'identifiant du bloc à modifier
-     * @param blocRequest les nouvelles données
+     * @param blockRequest les nouvelles données
      * @return le bloc mise à jour
      */
-    BlocResponse updateBloc(Long id, BlocRequest blocRequest);
+    BlockResponse updateBlock(Long id, BlockRequest blockRequest);
 
     /**
      * Supprime définitivement un bloc.
      *
      * @param id l'identifiant du bloc à supprimer
      */
-    void deleteBloc(Long id);
+    void deleteBlock(Long id);
 }
